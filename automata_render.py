@@ -6,7 +6,6 @@ def inline_video(environment, frame_interval_millis = 50, frame_count = 100, ite
     fig, ax = plt.subplots();
     mat = ax.matshow(environment.grid);
 
-
     def update(_data):
         for i in range(iterations_per_frame):
             environment.iterate()
