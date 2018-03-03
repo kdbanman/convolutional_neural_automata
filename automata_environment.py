@@ -39,4 +39,7 @@ class AutomataEnvironment:
         self.previous_grid = self.current_grid
         self.current_grid = tmp_grid
 
+        # The entire grids are passed to avoid artificially constraining ruleset implementation.
+        # EX: - 3x3 von Neumann neighborhood, 5x5 Moore neighborhood, and beyond are possible
+        #     - fast implementation via numpy backend or tensor-on-gpu convolution are possible
         self.rules.mutate_current_grid(self.previous_grid, self.current_grid)
