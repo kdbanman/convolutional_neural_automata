@@ -18,3 +18,10 @@ def inline_video(environment, frame_interval_millis = 50, frame_count = 100, ite
     
     # close the figure to avoid rendering it separately, since it was just used to build the video
     plt.close(fig)
+
+def inline_frame(environment):
+    fig, ax = plt.subplots()
+    mat = ax.matshow(environment.current_grid)
+    mat.set_data(environment.current_grid)
+
+    return mat
