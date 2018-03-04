@@ -46,6 +46,7 @@ class SimpleConvNet(nn.Module):
         padded_environment_tensor.scatter_(0, row_copy_target_index, padded_environment_tensor)
         padded_environment_tensor.scatter_(1, col_copy_target_index, padded_environment_tensor)
 
+        # NOTE: I think this .view call breaks batch training, because it assumes a batch size of 1 (first dimension is 1)
         convolution_ready_environment_tensor = padded_environment_tensor.view(1, 1, padded_height, padded_width).double()
 
         return convolution_ready_environment_tensor
