@@ -28,7 +28,7 @@ class AutomataEnvironment:
         
     def randomize_state(self, live_probability = 0.2):
         self.current_grid = np.random.choice(
-            [1, 0],
+            [1.0, 0.0],
             self.grid_height * self.grid_width,
             p=[live_probability, 1 - live_probability]
         ).reshape(self.grid_height, self.grid_width)
