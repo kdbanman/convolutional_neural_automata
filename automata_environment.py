@@ -1,3 +1,11 @@
+# Convolutional Neural Automata
+# Neural networks trained as cellular automata.
+# Copyright (C) 2018  Kirby Banman (kirby.banman@gmail.com)
+
+# Redistributable and modifiable under the terms of GNU GPLv3.
+# See LICENSE.txt or <http://www.gnu.org/licenses/>
+
+
 import numpy as np
 
 class AutomataEnvironment:
