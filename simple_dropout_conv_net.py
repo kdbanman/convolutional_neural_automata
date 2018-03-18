@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from toroidal_grid_padder import ToroidalGridPadder
+from conv_net_helpers import initialize_convolution_weights
 
 class SimpleDropoutConvNet(nn.Module):
     def __init__(self, hidden_channels = 30, dropout_fraction = 0.2):
@@ -21,6 +22,8 @@ class SimpleDropoutConvNet(nn.Module):
         self.conv1 = nn.Conv2d(1, hidden_channels, kernel_size=3)
         self.conv1_drop = nn.Dropout2d(p = dropout_fraction)
         self.conv2 = nn.Conv2d(hidden_channels, 1, kernel_size=3)
+
+        initialize_convolution_weights(self.modules())
 
     def forward(self, environment_grid):
         convolution_ready_environment_grid = self.toroidal_padder.pad_grid(environment_grid)

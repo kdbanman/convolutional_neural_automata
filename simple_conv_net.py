@@ -11,8 +11,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from toroidal_grid_padder import ToroidalGridPadder
+from conv_net_helpers import initialize_convolution_weights
 
 class SimpleConvNet(nn.Module):
+
     def __init__(self, hidden_channels = 10):
         super(SimpleConvNet, self).__init__()
 
@@ -20,6 +22,8 @@ class SimpleConvNet(nn.Module):
 
         self.conv1 = nn.Conv2d(1, hidden_channels, kernel_size=3)
         self.conv2 = nn.Conv2d(hidden_channels, 1, kernel_size=3)
+
+        initialize_convolution_weights(self.modules())
 
     def forward(self, environment_grid):
         '''
