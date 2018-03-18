@@ -11,12 +11,21 @@ import torch
 class AutomataConvolutionTrainer:
 
     def train_by_iteration(self, conv_net, reference_environment, iterations_to_train = 5000, learning_rate = 1e-2, progress_callback = None):
+        return self._train(False, conv_net, reference_environment, iterations_to_train, learning_rate, progress_callback)
+
+    def train_by_randomization(self, conv_net, reference_environment, iterations_to_train = 5000, learning_rate = 1e-2, progress_callback = None):
+        return self._train(True, conv_net, reference_environment, iterations_to_train, learning_rate, progress_callback)
+
+    def _train(self, randomized, conv_net, reference_environment, iterations_to_train, learning_rate, progress_callback):
         loss_fn = torch.nn.MSELoss(size_average=False)
         optimizer = torch.optim.Adam(conv_net.parameters(), lr=learning_rate)
 
         loss_history = []
         previous_callback_percent = 0
         for iteration in range(0, iterations_to_train):
+            if randomized:
+                reference_environment.randomize_state(live_probability = 0.5)
+
             reference_environment.iterate()
 
             input_grid = torch.autograd.Variable(torch.from_numpy(reference_environment.previous_grid))
