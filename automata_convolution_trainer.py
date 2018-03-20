@@ -6,19 +6,30 @@
 # See LICENSE.txt or <http://www.gnu.org/licenses/>
 
 
+from enum import Enum
+
 import torch
+
+class OptimizerType(Enum):
+    ADAM = 1
+    SGD = 2
 
 class AutomataConvolutionTrainer:
 
-    def train_by_iteration(self, conv_net, reference_environment, iterations_to_train = 5000, learning_rate = 1e-2, progress_callback = None):
-        return self._train(False, conv_net, reference_environment, iterations_to_train, learning_rate, progress_callback)
+    def __init__(self, conv_net, optimizer = OptimizerType.ADAM, learning_rate = 1e-2):
+        if optimizer is OptimizerType.ADAM:
+            self._optimizer = torch.optim.Adam(conv_net.parameters(), lr = learning_rate)
+        else:
+            self._optimizer = torch.optim.SGD(conv_net.parameters(), lr = learning_rate)
 
-    def train_by_randomization(self, conv_net, reference_environment, iterations_to_train = 5000, learning_rate = 1e-2, progress_callback = None):
-        return self._train(True, conv_net, reference_environment, iterations_to_train, learning_rate, progress_callback)
+    def train_by_iteration(self, conv_net, reference_environment, iterations_to_train = 5000, progress_callback = None):
+        return self._train(False, conv_net, reference_environment, iterations_to_train, progress_callback)
 
-    def _train(self, randomized, conv_net, reference_environment, iterations_to_train, learning_rate, progress_callback):
+    def train_by_randomization(self, conv_net, reference_environment, iterations_to_train = 5000, progress_callback = None):
+        return self._train(True, conv_net, reference_environment, iterations_to_train, progress_callback)
+
+    def _train(self, randomized, conv_net, reference_environment, iterations_to_train, progress_callback):
         loss_fn = torch.nn.MSELoss(size_average=False)
-        optimizer = torch.optim.Adam(conv_net.parameters(), lr=learning_rate)
 
         loss_history = []
         previous_callback_percent = 0
@@ -40,9 +51,9 @@ class AutomataConvolutionTrainer:
                 progress_callback(iteration, progress_percent, loss.data[0])
                 previous_callback_percent = progress_percent
 
-            optimizer.zero_grad()
+            self._optimizer.zero_grad()
             loss.backward()
 
-            optimizer.step()
+            self._optimizer.step()
         
         return loss_history
