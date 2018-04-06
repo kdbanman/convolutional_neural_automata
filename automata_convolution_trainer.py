@@ -22,17 +22,17 @@ class AutomataConvolutionTrainer:
         else:
             self._optimizer = torch.optim.SGD(conv_net.parameters(), lr = learning_rate)
 
-    def train_by_iteration(self, conv_net, reference_environment, iterations_to_train = 5000, progress_callback = None):
-        return self._train(False, conv_net, reference_environment, iterations_to_train, progress_callback)
+    def train_by_iteration(self, conv_net, reference_environment, iterations_to_train = 5000, progress_callback = None, progress_callback_iteration_period = 100):
+        return self._train(False, conv_net, reference_environment, iterations_to_train, progress_callback, progress_callback_iteration_period)
 
-    def train_by_randomization(self, conv_net, reference_environment, iterations_to_train = 5000, progress_callback = None):
-        return self._train(True, conv_net, reference_environment, iterations_to_train, progress_callback)
+    def train_by_randomization(self, conv_net, reference_environment, iterations_to_train = 5000, progress_callback = None, progress_callback_iteration_period = 100):
+        return self._train(True, conv_net, reference_environment, iterations_to_train, progress_callback, progress_callback_iteration_period)
 
-    def _train(self, randomized, conv_net, reference_environment, iterations_to_train, progress_callback):
+    def _train(self, randomized, conv_net, reference_environment, iterations_to_train, progress_callback, progress_callback_iteration_period):
         loss_fn = torch.nn.MSELoss(size_average=False)
 
         loss_history = []
-        previous_callback_percent = 0
+        previous_callback_iteration = 0
         for iteration in range(0, iterations_to_train):
             if randomized:
                 reference_environment.randomize_state(live_probability = 0.5)
@@ -46,10 +46,10 @@ class AutomataConvolutionTrainer:
             loss = loss_fn(predicted_output, known_output)
 
             loss_history.append(loss.data[0])
-            progress_percent = iteration // iterations_to_train
-            if progress_callback is not None and progress_percent > previous_callback_percent:
+            progress_percent = iteration * 100 / iterations_to_train
+            if progress_callback is not None and (iteration >= previous_callback_iteration + progress_callback_iteration_period or iteration == iterations_to_train):
                 progress_callback(iteration, progress_percent, loss.data[0])
-                previous_callback_percent = progress_percent
+                previous_callback_iteration = iteration
 
             self._optimizer.zero_grad()
             loss.backward()
